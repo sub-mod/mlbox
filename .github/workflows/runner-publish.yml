@@ -4,8 +4,8 @@
 name: Upload Python Package
 
 on:
-  release:
-    types: [created]
+  repository_dispatch:
+    types: publish-mlcommons-box
 
 jobs:
   deploy:
@@ -22,21 +22,10 @@ jobs:
         pip install setuptools wheel twine
     - name: Build distribution
       run: |
-        cd mlcommons_box
+        cd ../runners/mlcommons_box_ssh
         python setup.py sdist bdist_wheel
-        cp -avr dist ../
+        cp -avr dist ../../
     - name: Publish
       uses: pypa/gh-action-pypi-publish@master
       with:
         password: ${{ secrets.PYPI_PASSWORD }}
-
-  dispatch:
-    needs: deploy
-    runs-on: ubuntu-latest
-    steps:
-      - name: Repository Dispatch
-        uses: peter-evans/repository-dispatch@v1
-        with:
-          token: ${{ secrets.MLCOMMONS_REPO_ACCESS }}
-          repository: sub-mod/mlbox
-          event-type: publish-mlcommons-box
