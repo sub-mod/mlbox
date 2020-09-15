@@ -28,15 +28,18 @@ jobs:
     - name: Publish
       uses: pypa/gh-action-pypi-publish@master
       with:
+        user: __token__
         password: ${{ secrets.PYPI_PASSWORD }}
+        skip_existing: true
+        verify_metadata: false
 
-  dispatch:
-    needs: deploy
-    runs-on: ubuntu-latest
-    steps:
-      - name: Repository Dispatch
-        uses: peter-evans/repository-dispatch@v1
-        with:
-          token: ${{ secrets.MLCOMMONS_REPO_ACCESS }}
-          repository: mlperf/mlbox
-          event-type: publish-runners
+  # dispatch:
+  #   needs: deploy
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Repository Dispatch
+  #       uses: peter-evans/repository-dispatch@v1
+  #       with:
+  #         token: ${{ secrets.MLCOMMONS_REPO_ACCESS }}
+  #         repository: mlperf/mlbox
+  #         event-type: publish-runners

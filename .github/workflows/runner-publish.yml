@@ -28,6 +28,7 @@ jobs:
     - name: Publish
       uses: pypa/gh-action-pypi-publish@master
       with:
+        user: __token__
         password: ${{ secrets.MLCOMMONS_SSH_PYPI_TOKEN }}
 
   docker_deploy:
@@ -50,6 +51,7 @@ jobs:
     - name: Publish
       uses: pypa/gh-action-pypi-publish@master
       with:
+        user: __token__
         password: ${{ secrets.MLCOMMONS_DOCKER_PYPI_TOKEN }}
 
   singularity_deploy:
@@ -72,4 +74,5 @@ jobs:
     - name: Publish
       uses: pypa/gh-action-pypi-publish@master
       with:
+        user: __token__
         password: ${{ secrets.MLCOMMONS_SINGULARITY_PYPI_TOKEN }}
