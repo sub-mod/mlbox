@@ -3,7 +3,7 @@ import os
 
 import yaml
 
-from mlcommons_box.common.objects import base
+from .objects import base
 
 logger = logging.getLogger(__name__)
 
