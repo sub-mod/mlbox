@@ -1,7 +1,7 @@
 # Lint as: python3
-"""Parses an MLBox directory tree.
+"""Parses an MLCube directory tree.
 
-Will return objects which represent the metadata of the box.
+Will return objects which represent the metadata of the mlcube.
 """
 
 import os
@@ -10,7 +10,7 @@ from pathlib import Path
 from mlspeclib import MLObject, MLSchema
 
 
-class MLBoxMetadata:
+class MLCubeMetadata:
   def __init__(self, root, tasks, docker):
     self.root = root
     self.tasks = tasks
@@ -23,14 +23,14 @@ def _register_schemas():
   MLSchema.append_schema_to_registry(Path(Path(__file__).parent, "schemas"))
 
 
-def parse_mlbox_invoke(filename):
+def parse_mlcube_invoke(filename):
   if not os.path.exists(filename):
     return None, 'No such invocation file: {}'.format(filename)
   (root, err) = MLObject.create_object_from_file(filename)
   return root, err
 
 
-def parse_mlbox_root(filename):
+def parse_mlcube_root(filename):
   (root, err) = MLObject.create_object_from_file(filename)
   return root, err
 
@@ -52,21 +52,21 @@ def mlobject_from_dict(schema_type, schema_version, dict_value):
         return ml_object, None
 
 
-def parse_mlbox_task(filename):
+def parse_mlcube_task(filename):
     (task, err) = MLObject.create_object_from_file(filename)
     if err:
       return None, err
 
     inputs = {}
     for input_dict in task.inputs:
-      input_obj, err = mlobject_from_dict('mlbox_task_input', '1.0.0', input_dict)
+      input_obj, err = mlobject_from_dict('mlcube_task_input', '1.0.0', input_dict)
       if err:
         return None, err
       inputs[input_obj.name] = input_obj
 
     outputs = {}
     for output_dict in task.outputs:
-      output_obj, err = mlobject_from_dict('mlbox_task_output', '1.0.0', output_dict)
+      output_obj, err = mlobject_from_dict('mlcube_task_output', '1.0.0', output_dict)
       if err:
         return None, err
       outputs[output_obj.name] = output_obj
@@ -76,23 +76,23 @@ def parse_mlbox_task(filename):
     return task, None
 
 
-def parse_mlbox_docker(filename):
+def parse_mlcube_docker(filename):
     (docker, err) = MLObject.create_object_from_file(filename)
     return docker, err
 
 
-def parse_mlbox(root_dir):
-  path = Path(root_dir, 'mlbox.yaml').as_posix()
+def parse_mlcube(root_dir):
+  path = Path(root_dir, 'mlcube.yaml').as_posix()
   if not os.path.exists(path):
     return None, 'root metadata does not exist: {}'.format(path)
 
-  root, err = parse_mlbox_root(path)
+  root, err = parse_mlcube_root(path)
   if err:
     return None, err
 
   tasks = {}
   for task_file in root.tasks:
-    task, err = parse_mlbox_task(os.path.join(root_dir, task_file))
+    task, err = parse_mlcube_task(os.path.join(root_dir, task_file))
     if err:
       return None, err
     if task is None:
@@ -100,11 +100,11 @@ def parse_mlbox(root_dir):
     name = Path(task_file).name.strip('.yaml')
     tasks[name] = task
 
-  docker, err = parse_mlbox_docker(Path(root_dir, 'mlbox_docker.yaml').as_posix())
+  docker, err = parse_mlcube_docker(Path(root_dir, 'mlcube_docker.yaml').as_posix())
   if err:
     return None, err
 
-  return MLBoxMetadata(root, tasks, docker), None
+  return MLCubeMetadata(root, tasks, docker), None
 
 
 _register_schemas()

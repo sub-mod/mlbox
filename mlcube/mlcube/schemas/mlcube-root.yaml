@@ -2,15 +2,15 @@ mlspec_schema_version:
   meta: 1.0.0
 
 mlspec_schema_type: 
-  meta: mlbox_root
+  meta: mlcube_root
 
 schema_version:
-  # User previded: Identifies version of mlbox_input to use
+  # User previded: Identifies version of mlcube_input to use
   type: semver
   required: True
 
 schema_type:
-  # User previded: Identifies that this is a mlbox_input
+  # User previded: Identifies that this is a mlcube_input
   type: string
   required: True
 
@@ -26,7 +26,7 @@ version:
   type: semver
   required: True
 
-mlbox_spec_version: 
+mlcube_spec_version: 
   type: semver
   required: True
 
@@ -35,15 +35,15 @@ tasks:
   required: True
 
 # definitions:
-#  MLBoxRootConfig:
+#  MLCubeRootConfig:
 #    type: "object"
-#    description: "MLBox root configuration"
+#    description: "MLCube root configuration"
 #    properties:
 #      Name:
 #        type: "string"
 #      Version:
 #        type: "string"
-#      MLBoxSpecVersion:
+#      MLCubeSpecVersion:
 #        type: "string"
 #      Tasks:
 #        type: "object"

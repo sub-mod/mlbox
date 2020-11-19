@@ -5,24 +5,24 @@ try:
 except ImportError:
     from yaml import Loader, Dumper
 from typing import (Tuple, Any)
-from mlcommons_box.common import mlbox_metadata
+from mlcube.common import mlcube_metadata
 
 
 class StandardPaths(object):
-    """ Standard MLBox file system paths. """
+    """ Standard MLCube file system paths. """
 
-    # Base path. Do not use hidden paths such as .mlcommons-box. It does not work with Docker installed with snap.
-    ROOT = '${HOME}/mlcommons-box'
+    # Base path. Do not use hidden paths such as .mlcube. It does not work with Docker installed with snap.
+    ROOT = '${HOME}/mlcube'
     # Default path to store singularity containers.
     CONTAINERS = ROOT + '/containers'
-    # Default path to store MLBoxes for runners such as SSH and GCP (Google Compute Platform).
-    BOXES = ROOT + '/boxes'
+    # Default path to store MLCubes for runners such as SSH and GCP (Google Compute Platform).
+    BOXES = ROOT + '/cubes'
     # Default path for user python environments for runners such as SSH.
     ENVIRONMENTS = ROOT + '/environments'
 
 
 class Utils(object):
-    """Collection of various helper functions from the old MLBox branch.
+    """Collection of various helper functions from the old MLCube branch.
     Developed by: Victor Bittorf and Xinyuan Huang.
     Most of these methods are probably not used any more.
     """
@@ -51,20 +51,20 @@ class Utils(object):
             raise Exception('Command failed: {}'.format(cmd))
 
     @staticmethod
-    def container_args(mlbox: mlbox_metadata.MLBox) -> Tuple[dict, list]:
-        mounts, args = {}, [mlbox.invoke.task_name]
+    def container_args(mlcube: mlcube_metadata.MLCube) -> Tuple[dict, list]:
+        mounts, args = {}, [mlcube.invoke.task_name]
 
         def create_(binding_: dict, input_specs_: dict):
             # name: parameter name, path: parameter value
             for name, path in binding_.items():
-                path = path.replace('$WORKSPACE', mlbox.workspace_path)
+                path = path.replace('$WORKSPACE', mlcube.workspace_path)
 
                 path_type = input_specs_[name]
                 if path_type == 'directory':
                     os.makedirs(path, exist_ok=True)
                     mounts[path] = mounts.get(
                         path,
-                        '/mlbox_io{}/{}'.format(len(mounts), os.path.basename(path))
+                        '/mlcube_io{}/{}'.format(len(mounts), os.path.basename(path))
                     )
                     args.append('--{}={}'.format(name, mounts[path]))
                 elif path_type == 'file':
@@ -72,13 +72,13 @@ class Utils(object):
                     os.makedirs(file_path, exist_ok=True)
                     mounts[file_path] = mounts.get(
                         file_path,
-                        '/mlbox_io{}/{}'.format(len(mounts), file_path)
+                        '/mlcube_io{}/{}'.format(len(mounts), file_path)
                     )
                     args.append('--{}={}'.format(name, mounts[file_path] + '/' + file_name))
                 else:
                     raise RuntimeError(f"Invalid path type: '{path_type}'")
 
-        create_(mlbox.invoke.input_binding, mlbox.task.inputs)
-        create_(mlbox.invoke.output_binding, mlbox.task.outputs)
+        create_(mlcube.invoke.input_binding, mlcube.task.inputs)
+        create_(mlcube.invoke.output_binding, mlcube.task.outputs)
 
         return mounts, args

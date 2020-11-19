@@ -2,22 +2,21 @@ mlspec_schema_version:
   meta: 1.0.0
 
 mlspec_schema_type: 
-  meta: mlcommons_box_platform_metadata
+  meta: mlcube_platform_container
 
 schema_version:
-  # User previded: Identifies version of mlbox_input to use
+  # User previded: Identifies version of mlcube_input to use
   type: semver
   required: True
 
 schema_type:
-  # User previded: Identifies that this is a mlbox_input
+  # User previded: Identifies that this is a mlcube_input
   type: string
   required: True
 
-name:
+runtime:
   type: string
-  required: True
 
-version:
+image:
   type: string
   required: True

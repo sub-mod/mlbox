@@ -8,32 +8,32 @@ import click
 from halo import Halo
 import coloredlogs
 
-from mlcommons_box.check import check_root_dir
+from mlcube.check import check_root_dir
 
-@click.group(name='mlcommons_box')
+@click.group(name='mlcube')
 @click.option('--log-level', default="DEBUG", help="Log level for the app.")
 def cli(log_level: str):
     """
-    Box 📦 is a packaging tool for ML models
+    MLCube 📦 is a packaging tool for ML models
     """
     logger = logging.getLogger(__name__)
     click.echo(f"Log level is set to - {log_level}")
     coloredlogs.install(level=log_level)
 
 @cli.command()
-@click.argument('path_to_box')
+@click.argument('path_to_mlcube')
 @Halo(text="", spinner="dots")
-def verify(path_to_box: str):
+def verify(path_to_mlcube: str):
     """
-    Verify Box metadata
+    Verify MLCube metadata
     """
-    logging.info("Starting Box metadata verification")
+    logging.info("Starting mlcube metadata verification")
     metadata, verify_err = check_root_dir(
-    Path(path_to_box).resolve().as_posix())
+    Path(path_to_mlcube).resolve().as_posix())
 
     if verify_err:
-        logging.error(f"Error verifying Box metadata: {verify_err}")
-        logging.error(f"Box verification - FAILED!")
+        logging.error(f"Error verifying mlcube metadata: {verify_err}")
+        logging.error(f"mlcube verification - FAILED!")
         raise click.Abort()
 
     logging.info('OK - VERIFIED')

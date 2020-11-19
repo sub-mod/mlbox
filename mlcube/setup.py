@@ -21,7 +21,7 @@ class clean(Command):
 
 def schemas():
     paths = []
-    for (path, _, filenames) in os.walk("mlcommons_box/schemas"):
+    for (path, _, filenames) in os.walk("mlcube/schemas"):
         for filename in filenames:
             paths.append(os.path.join("..", path, filename))
     return paths
@@ -29,13 +29,13 @@ def schemas():
 extra_files = schemas()
 
 setup(
-    name="mlcommons_box",
-    version="0.2.3",
+    name="mlcube",
+    version="0.0.1",
     packages=find_packages(exclude=["tests"]),
     license="Apache 2.0",
     entry_points='''
         [console_scripts]
-        mlcommons_box=mlcommons_box.main:cli
+        mlcube=mlcube.main:cli
     ''',
     install_requires=requires,
     python_requires='>=3.6',

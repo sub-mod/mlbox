@@ -1,14 +1,14 @@
 # Lint as: python3
 """Generates a template of a docker.
 
-This takes an MLBox directory which has metadata filled in
+This takes an MLCube directory which has metadata filled in
 and produces docker and source files to build.
 """
 
 import sys
 import os
 
-from mlbox import mlbox_check
+from mlcube import mlcube_check
 
 
 DOCKER_TEMPLATE = """
@@ -19,7 +19,7 @@ RUN apt-get -y install python3
 
 ADD internal_docker_* /
 
-ENTRYPOINT ["/usr/bin/python3", "/internal_docker_mlbox_main.py"]
+ENTRYPOINT ["/usr/bin/python3", "/internal_docker_mlcube_main.py"]
 """
 
 INTERNAL_MAIN_TEMPLATE = """
@@ -45,7 +45,7 @@ def parse_command_line():
 
 
 def main():
-  print('MLBox starting.')
+  print('MLCube starting.')
   task, iomap = parse_command_line()
 
 {dispatch}
@@ -73,11 +73,11 @@ if __name__ == '__main__':
 
 
 def generate_function(task_name, io_names):
-  code = 'def mlbox_{}(iomap):\n'.format(task_name)
+  code = 'def mlcube_{}(iomap):\n'.format(task_name)
   for io_name in io_names:
     code += '  {} = iomap["{}"]\n'.format(io_name, io_name)
 
-  command_line = '  return os.system("python3 internal_docker_mlbox_task_{}.py '.format(task_name)
+  command_line = '  return os.system("python3 internal_docker_mlcube_task_{}.py '.format(task_name)
   command_line += ' {} ' * len(io_names)
   command_line += '".format({}))'.format(', '.join(io_names))
   code += command_line
@@ -91,10 +91,10 @@ def generate_dispatch(task_names):
       code += '  if task == "{}":\n'.format(task_name)
     else:
       code += '  elif task == "{}":\n'.format(task_name)
-    code += '    if not mlbox_{}(iomap):\n'.format(task_name)
+    code += '    if not mlcube_{}(iomap):\n'.format(task_name)
     code += '      sys.exit(1)\n'
   code += '  else:\n'
-  code += '    print("No known MLBox task: {}".format(task))\n'
+  code += '    print("No known MLCube task: {}".format(task))\n'
   code += '    sys.exit(1)\n'
   return code
 
@@ -113,28 +113,28 @@ def generate_task_main_text(task_name, io_names):
   return TASK_MAIN.format(args=args)
 
 
-def generate_readme_text(mlbox_root, mlbox, task_main_names):
+def generate_readme_text(mlcube_root, mlcube, task_main_names):
   run_yamls = []
-  for f in os.listdir(os.path.join(mlbox_root, 'run')):
+  for f in os.listdir(os.path.join(mlcube_root, 'run')):
     if '.yaml' in f:
-      run_yamls.append(os.path.join(os.path.join(mlbox_root, 'run'), f))
+      run_yamls.append(os.path.join(os.path.join(mlcube_root, 'run'), f))
 
   if len(run_yamls) == 0:
-    run_text = 'You need to first create some run configs under {}'.format(os.path.join(mlbox_root, 'run'))
+    run_text = 'You need to first create some run configs under {}'.format(os.path.join(mlcube_root, 'run'))
   else:
     run_text = ''
     for run in run_yamls:
-      run_text += 'python3 mlbox_docker_run/docker_run.py --no-pull {}\n'.format(run)
+      run_text += 'python3 mlcube_docker_run/docker_run.py --no-pull {}\n'.format(run)
 
-  text = r"""Here is a starting point to create your MLBox's Docker Image.
+  text = r"""Here is a starting point to create your MLCube's Docker Image.
 
 Here are some notes to get started:
 - Feel free to replace Dockerfile with an existing one you use!
-- Make sure to use internal_docker_mlbox_main.py as your main file (even in a
+- Make sure to use internal_docker_mlcube_main.py as your main file (even in a
   different docker).
 
 
-1. Each task in your MLBox has a separate main file which was generated:
+1. Each task in your MLCube has a separate main file which was generated:
 {task_mains}
 Edit these files to call your model.
 
@@ -146,17 +146,17 @@ sudo docker build . -t {docker_tag}
 
 4. Once  your docker works, upload it to the respository.
 docker push {docker_tag}
-""".format(task_mains=', '.join(task_main_names), docker_tag=mlbox.docker.image, run_text=run_text)
+""".format(task_mains=', '.join(task_main_names), docker_tag=mlcube.docker.image, run_text=run_text)
   return text
 
 
-def generate_internal_main(mlbox):
-  task_names = list(mlbox.tasks)
+def generate_internal_main(mlcube):
+  task_names = list(mlcube.tasks)
   task_main_texts = {}
 
   functions = ''
   for task_name in task_names:
-    task = mlbox.tasks[task_name]
+    task = mlcube.tasks[task_name]
     io_names = []
     io_names.extend(task.inputs)
     io_names.extend(task.outputs)
@@ -172,10 +172,10 @@ def generate_internal_main(mlbox):
   return text, task_main_texts
 
 
-def generate(mlbox_dir, mlbox):
-  internal_main_text, task_main_texts = generate_internal_main(mlbox)
+def generate(mlcube_dir, mlcube):
+  internal_main_text, task_main_texts = generate_internal_main(mlcube)
 
-  main_file_path = os.path.join(mlbox_dir, 'build', 'internal_docker_mlbox_main.py')
+  main_file_path = os.path.join(mlcube_dir, 'build', 'internal_docker_mlcube_main.py')
   if not os.path.exists(os.path.dirname(main_file_path)):
     os.mkdir(os.path.dirname(main_file_path))
 
@@ -183,25 +183,25 @@ def generate(mlbox_dir, mlbox):
 
   task_main_names = []
   for task_name in task_main_texts:
-    task_file_path = os.path.join(mlbox_dir, 'build', 'internal_docker_mlbox_task_{}.py'.format(task_name))
+    task_file_path = os.path.join(mlcube_dir, 'build', 'internal_docker_mlcube_task_{}.py'.format(task_name))
     task_main_names.append(task_file_path)
     write_file(task_file_path, task_main_texts[task_name])
 
-  docker_file_path = os.path.join(mlbox_dir, 'build', 'Dockerfile')
+  docker_file_path = os.path.join(mlcube_dir, 'build', 'Dockerfile')
   write_file(docker_file_path, DOCKER_TEMPLATE)
 
-  readme_file_path = os.path.join(mlbox_dir, 'build', 'README.md')
-  readme_text = generate_readme_text(mlbox_dir, mlbox, task_main_names)
+  readme_file_path = os.path.join(mlcube_dir, 'build', 'README.md')
+  readme_text = generate_readme_text(mlcube_dir, mlcube, task_main_names)
   write_file(readme_file_path, readme_text)
 
 
 def main():
   if len(sys.argv) != 2:
-    print('usage: MLBOX_DIR')
+    print('usage: MLCUBE_DIR')
     sys.exit(-1)
-  mlbox_dir = sys.argv[1]
-  mlbox = mlbox_check.check_root_dir_or_die(mlbox_dir)
-  generate(mlbox_dir, mlbox)
+  mlcube_dir = sys.argv[1]
+  mlcube = mlcube_check.check_root_dir_or_die(mlcube_dir)
+  generate(mlcube_dir, mlcube)
 
 
 if __name__ == '__main__':

@@ -2,7 +2,7 @@ mlspec_schema_version:
   meta: 1.0.0
 
 mlspec_schema_type:
-  meta: mlbox_invoke
+  meta: mlcube_invoke
 
 schema_type:
   type: string

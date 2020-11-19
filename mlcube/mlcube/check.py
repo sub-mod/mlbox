@@ -1,5 +1,5 @@
 # Lint as: python3
-"""Checks MLBox metadata to ensure it is valid.
+"""Checks MLCube metadata to ensure it is valid.
 
 Will crawl a parsed metadata and check for sanity and correctness.
 """
@@ -7,10 +7,10 @@ Will crawl a parsed metadata and check for sanity and correctness.
 import sys
 
 from pathlib import Path
-from mlcommons_box.parse import parse_mlbox
+from mlcube.parse import parse_mlcube
 
 def check_root_dir(root_dir):
-  metadata, err = parse_mlbox(Path(root_dir).resolve().as_posix())
+  metadata, err = parse_mlcube(Path(root_dir).resolve().as_posix())
   if err:
     return None, err
 
@@ -29,7 +29,7 @@ def check_root_dir_or_die(root_dir):
 
 
 def check_invoke_file(invoke_file):
-  metadata, err = parse_mlbox_invoke(Path(invoke_file).resolve().as_posix())
+  metadata, err = parse_mlcube_invoke(Path(invoke_file).resolve().as_posix())
   if err:
     return None, err
 
@@ -70,6 +70,6 @@ def check_invoke_semantics_or_die(metadata, invoke):
   err = check_invoke_semantics(metadata, invoke)
   if not err:
     return
-  print('FATAL invoke not valid for this box: {}'.format(err))
+  print('FATAL invoke not valid for this mlcube: {}'.format(err))
   sys.exit(1)
 
